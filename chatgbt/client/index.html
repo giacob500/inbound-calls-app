@@ -1,0 +1,50 @@
+<!-- Client-side (index.html) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>People List</title>
+  <style>
+    .small-font {
+      font-size: smaller;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="currentPerson"></h1>
+  <button id="nextButton">Next</button>
+  <ul id="remainingPeople"></ul>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    socket.on('updateList', (peopleList) => {
+      updateRemainingPeople(peopleList);
+    });
+
+    socket.on('updateCurrent', (currentPerson) => {
+      document.getElementById('currentPerson').textContent = currentPerson;
+      updateRemainingPeople();
+    });
+
+    document.getElementById('nextButton').addEventListener('click', () => {
+      socket.emit('next');
+    });
+
+    function updateRemainingPeople(peopleList) {
+      const remainingPeopleElement = document.getElementById('remainingPeople');
+      remainingPeopleElement.innerHTML = '';
+      peopleList.forEach((person, index) => {
+        if (index !== currentIndex) {
+          const li = document.createElement('li');
+          li.textContent = person;
+          li.classList.add('small-font');
+          remainingPeopleElement.appendChild(li);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

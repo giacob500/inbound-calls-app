@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>People List</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+  <h1 id="currentPerson"></h1>
+  <button onclick="nextPerson()">Next</button>
+  <ul id="peopleList"></ul>
+</div>
+<script>
+  const people = ["Mario", "Giovanni", "Emma"]; // List of people
+
+let currentIndex = 0;
+
+function displayPeople() {
+  document.getElementById("currentPerson").innerText = people[currentIndex];
+  
+  const listItems = people.map((person, index) => {
+    if (index === currentIndex) {
+      return `<li><strong>${person}</strong></li>`;
+    } else {
+      return `<li>${person}</li>`;
+    }
+  });
+  
+  document.getElementById("peopleList").innerHTML = listItems.join("");
+}
+
+function nextPerson() {
+  currentIndex = (currentIndex + 1) % people.length;
+  displayPeople();
+}
+
+// Initial display
+displayPeople();
+
+</script>
+</body>
+</html>

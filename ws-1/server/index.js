@@ -25,7 +25,7 @@ const io = new Server(expressServer, {
 })
 
 let currentIndex = 0;
-const people = ["Lee", "Giacomo", "Marie", "Stacey", "Cameron", "Billy", "Sam"]; // List of people
+const people = ["Mario", "Giacomo", "Antonio", "Anna", "Digby", "Isabella", "Marco"]; // List of people
 
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`)

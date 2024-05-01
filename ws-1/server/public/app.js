@@ -1,4 +1,4 @@
-const socket = io('https://gofibre-inbound-calls-app.onrender.com')
+const socket = io('https://inbound-calls-app.onrender.com')
 
 function sendMessage(e) {
     e.preventDefault()

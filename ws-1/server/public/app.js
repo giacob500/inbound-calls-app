@@ -1,4 +1,4 @@
-const socket = io('https://inbound-calls-app.onrender.com')
+const socket = io('ws://localhost:3500')
 
 function sendMessage(e) {
     e.preventDefault()

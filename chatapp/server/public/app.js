@@ -1,21 +1,40 @@
 const socket = io('ws://localhost:3500')
 
+const activity = document.querySelector('.activity')
+const msgInput = document.querySelector('input')
+
 function sendMessage(e) {
     e.preventDefault() /* Submit the form without reloading the page */
-    const input = document.querySelector('input')
-    if (input.value) {
-        /* After we send the message we want to erase what's in the input */
-        socket.emit('message', input.value)
-        input.value = ""
+    if (msgInput.value) {
+        /* After we send the message we want to erase what's in the msgInput */
+        socket.emit('message', msgInput.value)
+        msgInput.value = ""
     }
-    input.focus()
+    msgInput.focus()
 }
 
 document.querySelector('form').addEventListener('submit', sendMessage)
 
 // Listen for messages
 socket.on("message", (data) => {
+    activity.textContent = ""
     const li = document.createElement('li')
     li.textContent = data
     document.querySelector('ul').appendChild(li)
+})
+
+msgInput.addEventListener('keypress', () => {
+    socket.emit('activity', socket.id.substring(0, 5))
+})
+
+let activityTimer
+
+socket.on("activity", (name) => {
+    activity.textContent = `${name} is typing...`
+
+    // Clear after 1 second
+    clearTimeout(activityTimer)
+    activityTimer = setTimeout(() => {
+        activity.textContent = ""
+    }, 1000)
 })

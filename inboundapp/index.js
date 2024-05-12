@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const testStaff = ["Mario", "Giacomo", "Antonio", "Anna", "Digby", "Isabella", "Marco"]; // List of staff people
+
 const PORT = process.env.PORT || 3500
 const ADMIN = "Admin"
 
@@ -22,6 +24,13 @@ const UsersState = {
     users: [],
     setUsers: function(newUsersArray) {
         this.users = newUsersArray
+    }
+}
+
+const StaffState = {
+    staff: [],
+    setStaff: function(newStaffArray) {
+        this.staff = newStaffArray
     }
 }
 
@@ -101,6 +110,7 @@ io.on('connection', socket => {
 
         if (room) {
             io.to(room).emit('message', buildMsg(name, text))
+            socket.emit('message', buildMsg(ADMIN, `${testStaff} is a test list`))
         }        
     })
 
@@ -151,4 +161,9 @@ function getUsersInRoom(room) {
 
 function getAllActiveRooms() {
     return Array.from(new Set(UsersState.users.map(user => user.room)))
+}
+
+// Staff functions
+function getStaffInRoom(room) {
+    return StaffState.staff.filter(user => user.room === room)
 }

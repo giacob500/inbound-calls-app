@@ -1,4 +1,4 @@
-const socket = io('ws://localhost:3500')
+const socket = io('https://chat-app-8rxu.onrender.com')
 
 const msgInput = document.querySelector('#message')
 const nameInput = document.querySelector('#name')
@@ -56,9 +56,9 @@ socket.on("message", (data) => {
         <span class="post__header--name">${name}</span>
         <span class="post__header--time">${time}</span>
         </div>
-        <div calss="post__text">${text}</div>`
+        <div class="post__text">${text}</div>`
     } else {
-        li.innerHTML = `<div calss="post__text">${text}</div>`
+        li.innerHTML = `<div class="post__text">${text}</div>`
     }
     document.querySelector('.chat-display').appendChild(li)
 

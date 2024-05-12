@@ -1,4 +1,4 @@
-const socket = io('https://inbound-calls-app.onrender.com/')
+const socket = io('ws://localhost:3500')
 
 function sendMessage(e) {
     e.preventDefault()
@@ -27,15 +27,16 @@ socket.on("message", (data) => {
 // Listen for current person updates
 socket.on("currentPerson", (data) => {
     document.getElementById("currentPerson").innerText = data;
+    console.log(data)
 });
 
 // Listen for updated people list
 socket.on("peopleList", (data) => {
     const listItems = data.map((person, index) => {
         if (index === currentIndex) {
-            return `<li><strong>${person}</strong></li>`;
+            document.getElementById("peopleList").innerHTML = `<li><strong>${person}</strong></li>`;
         } else {
-            return `<li>${person}</li>`;
+            document.getElementById("peopleList").innerHTML = `<li>${person}</li>`;
         }
     });
   

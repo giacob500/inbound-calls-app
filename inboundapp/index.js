@@ -6,8 +6,6 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const testStaff = ["Mario", "Giacomo", "Antonio", "Anna", "Digby", "Isabella", "Marco"]; // List of staff people
-
 const PORT = process.env.PORT || 3500
 const ADMIN = "Admin"
 
@@ -57,7 +55,7 @@ io.on('connection', socket => {
 
         const user = activateUser(socket.id, name, room)
 
-        // Cannot update previous room users list until after the state upadte in activate user
+        // Cannot update previous room users list until after the state update in activate user
         if(prevRoom) {
             io.to(prevRoom).emit('userList', {
                 users: getUsersInRoom(prevRoom)
@@ -78,9 +76,19 @@ io.on('connection', socket => {
             users: getUsersInRoom(user.room)
         })
 
-        // Updaterooms list for everyone
+        // Update staff member list for room
+        io.to(user.room).emit('staffList', {
+            staff: getStaffInRoom(user.room)
+        })
+
+        // Update rooms list for everyone
         io.emit('roomList', {
             rooms: getAllActiveRooms()
+        })
+
+        // Update staff members list for everyone
+        io.emit('staffList', {
+            staff: getAllActiveStaff()
         })
     })
 
@@ -110,7 +118,26 @@ io.on('connection', socket => {
 
         if (room) {
             io.to(room).emit('message', buildMsg(name, text))
-            socket.emit('message', buildMsg(ADMIN, `${testStaff} is a test list`))
+        }        
+    })
+
+    // Listening for a new staff member event
+    socket.on('newStaffMember', ({name, text}) => {
+        const room = getUser(socket.id)?.room
+        const newMember = activateStaffMember(socket.id, text, room)
+        
+        // Join new staff member
+        socket.join(newMember.room)
+        // Update staff members list for everyone
+        io.emit('staffList', {
+            staff: getAllActiveStaff()
+        })
+
+        console.log('New staff member:', `${text} - addded by ${name}`);
+        StaffState.staff.forEach(user => console.log('Staff Member:', user));
+
+        if (room) {
+            io.to(room).emit('newStaffMember', buildMsg('Admin', `${name} added ${text} to list of staff members`))
         }        
     })
 
@@ -164,6 +191,19 @@ function getAllActiveRooms() {
 }
 
 // Staff functions
+function activateStaffMember(id, name, room) {
+    const newMember = {id, name, room}
+    StaffState.setStaff([
+        ...StaffState.staff,
+        newMember
+    ])
+    return newMember
+}
+
 function getStaffInRoom(room) {
     return StaffState.staff.filter(user => user.room === room)
+}
+
+function getAllActiveStaff() {
+    return Array.from(new Set(StaffState.staff.map(user => user)))
 }

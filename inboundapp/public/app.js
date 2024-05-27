@@ -28,9 +28,9 @@ function addStaff(e) {
     e.preventDefault() /* Submit the form without reloading the page */
     if (nameInput.value && staffInput.value && chatRoom.value) {
         /* After we send the message we want to erase what's in the msgInput */
-        socket.emit('message', {
+        socket.emit('newStaffMember', {
             name: nameInput.value,
-            text: msgInput.value
+            text: staffInput.value
         })
         staffInput.value = ""
     }
@@ -57,8 +57,38 @@ msgInput.addEventListener('keypress', () => {
     socket.emit('activity', nameInput.value)
 })
 
+staffInput.addEventListener('keypress', () => {
+    socket.emit('activity', staffInput.value)
+})
+
 // Listen for messages
 socket.on("message", (data) => {
+    activity.textContent = ""
+    const {name, text, time} = data         // Destructuring the data variable
+    const li = document.createElement('li')
+    li.className = 'post'
+    if (name === nameInput.value) li.className = 'post post--left'
+    if (name !== nameInput.value && name !== 'Admin') li.className = 'post post--right'
+    if (name !== 'Admin') {
+        li.innerHTML = `<div class="post__header ${name === nameInput.value
+            ? 'post__header--user'
+            : 'post__header--reply'
+        }">
+        <span class="post__header--name">${name}</span>
+        <span class="post__header--time">${time}</span>
+        </div>
+        <div class="post__text">${text}</div>`
+    } else {
+        li.innerHTML = `<div class="post__text">${text}</div>`
+    }
+    document.querySelector('.chat-display').appendChild(li)
+
+    // Chat scrolling down as new messages come in
+    chatDisplay.scrollTop = chatDisplay.scrollHeight
+})
+
+// Listen for a new staff member added to the list
+socket.on("newStaffMember", (data) => {
     activity.textContent = ""
     const {name, text, time} = data         // Destructuring the data variable
     const li = document.createElement('li')

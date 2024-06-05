@@ -29,8 +29,8 @@ function addStaff(e) {
     if (nameInput.value && staffInput.value && chatRoom.value) {
         /* After we send the message we want to erase what's in the msgInput */
         socket.emit('newStaffMember', {
-            name: nameInput.value,
-            text: staffInput.value
+            author: nameInput.value,
+            name: staffInput.value
         })
         staffInput.value = ""
     }
@@ -59,6 +59,11 @@ msgInput.addEventListener('keypress', () => {
 
 staffInput.addEventListener('keypress', () => {
     socket.emit('activity', staffInput.value)
+})
+
+// Listen for log messages
+socket.on('logActivity', ({text, time}) => {
+    console.log(`${time} - ${text}`);
 })
 
 // Listen for messages
@@ -143,8 +148,8 @@ function showStaff(staff) {
     staffList.textContent = ''
     if (staff) {
         staffList.innerHTML = `<em>Staff members in ${chatRoom.value}:</em>`
-        staff.forEach((user, i) => {
-            staffList.textContent += ` ${user.name}`
+        staff.forEach((member, i) => {
+            staffList.textContent += ` ${member.name}`
             if (staff.length > 1 && i !== staff.length - 1) {
                 staffList.textContent += ","
             }

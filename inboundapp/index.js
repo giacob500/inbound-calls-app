@@ -42,7 +42,7 @@ io.on('connection', socket => {
     console.log(`User ${socket.id} connected`)
 
     // Upon connection - only to user
-    socket.emit('message', buildMsg(ADMIN, "Welcome to Chat App!"))
+    socket.emit('message', buildMsg(ADMIN, "Welcome to the chat!"))
 
     socket.on('enterRoom', ({name, room}) => {
         // leave a previous room
@@ -122,9 +122,9 @@ io.on('connection', socket => {
     })
 
     // Listening for a new staff member event
-    socket.on('newStaffMember', ({name, text}) => {
+    socket.on('newStaffMember', ({author, name}) => {
         const room = getUser(socket.id)?.room
-        const newMember = activateStaffMember(socket.id, text, room)
+        const newMember = activateStaffMember(socket.id, name, room)
         
         // Join new staff member
         socket.join(newMember.room)
@@ -133,11 +133,12 @@ io.on('connection', socket => {
             staff: getAllActiveStaff()
         })
 
-        console.log('New staff member:', `${text} - addded by ${name}`);
+        console.log('New staff member:', `${name} - addded by ${author}`);
         StaffState.staff.forEach(user => console.log('Staff Member:', user));
 
         if (room) {
-            io.to(room).emit('newStaffMember', buildMsg('Admin', `${name} added ${text} to list of staff members`))
+            io.to(room).emit('newStaffMember', buildMsg('Admin', `${author} added '${name}' to list of staff members`))
+            io.to(room).emit('logActivity', buildLog(`${author} added ${name} to list of staff members`))
         }        
     })
 
@@ -149,6 +150,18 @@ io.on('connection', socket => {
         }
     })
 })
+
+function buildLog(text) {
+    return {
+        text,
+        time: new Intl.DateTimeFormat('default', {
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+        }).format(new Date())
+    }
+}
+
 
 function buildMsg(name, text) {
     return {
